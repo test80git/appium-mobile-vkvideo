@@ -1,6 +1,7 @@
 package ru.kuz.tests;
 
 import static ru.kuz.helper.Constants.SCREENSHOT_TO_SAVE_FOLDER;
+import static ru.kuz.helper.DeviceHelper.executeBash;
 
 import com.codeborne.selenide.Configuration;
 import com.codeborne.selenide.Selenide;
@@ -36,18 +37,28 @@ public class BaseTest {
         Configuration.browser = RunHelper.runHelper().getDriverClass().getName();
         Configuration.browserSize = null;
         Configuration.timeout = 10000;
-//        disableAnimationOnEmulator();
+        disableAnimationOnEmulator();
 
     }
 
-//    /**
-//     * Отключение анимаций на эмуляторе чтобы не лагало
-//     */
-//    private static void disableAnimationOnEmulator() {
-//        executeBash("adb -s shell settings put global transition_animation_scale 0.0");
-//        executeBash("adb -s shell settings put global window_animation_scale 0.0");
-//        executeBash("adb -s shell settings put global animator_duration_scale 0.0");
-//    }
+    /**
+     * Отключение анимаций на эмуляторе чтобы не лагало
+     */
+    private static void disableAnimationOnEmulator() {
+        String adbCommand = getAdbCommand();
+        executeBash(adbCommand + " shell settings put global transition_animation_scale 0.0");
+        executeBash(adbCommand + " shell settings put global window_animation_scale 0.0");
+        executeBash(adbCommand + " shell settings put global animator_duration_scale 0.0");
+    }
+
+    private static String getAdbCommand() {
+        String os = System.getProperty("os.name").toLowerCase();
+        if (os.contains("win")) {
+            return "adb.exe";  // Windows
+        } else {
+            return "adb";      // Linux/Mac
+        }
+    }
 
 
     @BeforeEach
