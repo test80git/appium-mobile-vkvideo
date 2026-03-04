@@ -1,5 +1,9 @@
 package ru.kuz.tests;
 
+import static com.codeborne.selenide.Selenide.sleep;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -43,11 +47,28 @@ public class VkVideoTests extends BaseTest {
 
     @Test
     @Description("Позитивный тест: Звук работает")
-    public void testSoundControl(){
+    public void testSoundControl() {
         // ШАГ 1: Открываем видео
         mainPage.waitForPageLoaded();
 
         playerPage.soundClick();
+    }
+
+
+    @Test
+    @Description("Негативный тест: Видео не воспроизводится без интернета")
+    public void testVideoPlaybackNegative() {
+        disableInternet();
+        try {
+            mainPage.waitForPageLoaded();
+            mainPage.openFirstVideo();
+            // Проверить, что видео не загружается
+            boolean videoLoaded = playerPage.isVideoLoaded(); // проверяем sound_control
+            assertFalse(videoLoaded, "Видео не должно загружаться без интернета");
+        } finally {
+            // ВСЕГДА включаем интернет обратно
+            enableInternet();
+        }
     }
 
 }

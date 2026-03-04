@@ -60,6 +60,34 @@ public class BaseTest {
         }
     }
 
+    /**
+     * Отключение Интернета
+     */
+    public static void disableInternet() {
+        try {
+            String adb = getAdbCommand();
+            Runtime.getRuntime().exec(adb + " shell svc wifi disable");
+            Runtime.getRuntime().exec(adb + " shell svc data disable");
+            Thread.sleep(2000); // Подождать, пока применится
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Включение Интернета
+     */
+    public static void enableInternet() {
+        try {
+            String adb = getAdbCommand();
+            Runtime.getRuntime().exec(adb + " shell svc wifi enable");
+            Runtime.getRuntime().exec(adb + " shell svc data enable");
+            Thread.sleep(2000); // Подождать, пока применится
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 
     @BeforeEach
     public void startDriver() {

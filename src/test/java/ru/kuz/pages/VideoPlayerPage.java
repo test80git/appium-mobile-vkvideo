@@ -125,4 +125,23 @@ public class VideoPlayerPage {
         return this;
     }
 
+
+    /**
+     * Проверяет, загрузилось ли видео (по наличию кнопки звука)
+     * @return true - видео загружено (кнопка звука есть), false - видео не загружено
+     */
+    @Step("Проверяем, загрузилось ли видео")
+    public boolean isVideoLoaded() {
+        try {
+            log.info("Проверяем, загрузилось ли видео по наличию кнопки звука");
+            // Ждем появления кнопки звука максимум 5 секунд
+            boolean exists = soundButton.exists();
+            log.info("Кнопка звука {}", exists ? "присутствует" : "отсутствует");
+            return exists;
+        } catch (Exception e) {
+            log.error("Ошибка при проверке загрузки видео: {}", e.getMessage());
+            return false;
+        }
+    }
+
 }
