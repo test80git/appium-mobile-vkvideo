@@ -26,21 +26,21 @@ public class EmulatorHelper {
     }
 
     /**
-     * Листает к элементу по его тексту (обновленная версия для Appium 9.x)
+     * КЛИКАЕТ по элементу с точным совпадением текста
      *
-     * @param text текст на элементе
+     * @param text точный текст элемента
      */
-    public static void androidScrollToAnElementByText(String text) {
+    public static void clickByExactText(String text) {
         By selector = By.xpath("//*[@text='" + text + "']");
         getDriver().findElement(selector).click();
     }
 
     /**
-     * Скролл с использованием UiAutomator2 (альтернативный метод)
+     * КЛИКАЕТ по элементу, содержащему указанный текст
      *
      * @param text текст элемента для скролла
      */
-    public static void scrollToText(String text) {
+    public static void clickByPartialText(String text) {
         getDriver().findElement(By.xpath(
                 "//*[contains(@text, '" + text + "')]"
         )).click();
