@@ -41,4 +41,13 @@ public class VkVideoTests extends BaseTest {
         playerPage.verifyTimeIncreasing();
     }
 
+    @Test
+    @Description("Позитивный тест: Звук работает")
+    public void testSoundControl(){
+        // ШАГ 1: Открываем видео
+        mainPage.waitForPageLoaded();
+
+        playerPage.soundClick();
+    }
+
 }

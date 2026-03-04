@@ -1,5 +1,6 @@
 package ru.kuz.pages;
 
+import static com.codeborne.selenide.Condition.attribute;
 import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.sleep;
 import static com.codeborne.selenide.WebDriverRunner.getWebDriver;
@@ -7,6 +8,7 @@ import static com.codeborne.selenide.WebDriverRunner.getWebDriver;
 import com.codeborne.selenide.Condition;
 import com.codeborne.selenide.SelenideElement;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +19,7 @@ import io.appium.java_client.MobileBy;
 import io.appium.java_client.TouchAction;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.touch.offset.PointOption;
+import io.qameta.allure.Allure;
 import io.qameta.allure.Step;
 
 public class VideoPlayerPage {
@@ -24,6 +27,8 @@ public class VideoPlayerPage {
 
     private SelenideElement seekBar = $(MobileBy.id("com.vk.vkvideo:id/seek_bar"));
     private SelenideElement videoContainer = $(MobileBy.id("com.vk.vkvideo:id/vk_video_minimizable_player_container"));
+
+    private SelenideElement soundButton = $(By.id("com.vk.vkvideo:id/sound_control"));
 
     private AndroidDriver getDriver() {
         return (AndroidDriver) getWebDriver();
@@ -93,4 +98,31 @@ public class VideoPlayerPage {
         sleep(seconds * 1000L);
         return this;
     }
+
+    @Step("Проверяем, что звук меняется")
+    public VideoPlayerPage soundClick() {
+        log.info("Проверяем что звук меняется");
+        // Получить текущее состояние (через content-desc)
+        String state = soundButton.getAttribute("content-desc");
+        boolean isMuted = "Mute".equals(state);
+        boolean isUnMuted = "Unmute".equals(state);
+        log.debug("Звук Включен {}", isMuted);
+
+        // Кликнуть
+        soundButton.click();
+
+        if (isMuted) {
+            // Проверить, что состояние изменилось
+            soundButton.shouldHave(attribute("content-desc", "Unmute"));  // или "Unmute"
+            log.info("Звук Выключили");
+            Allure.step("Звук Выключили");
+        }
+        if (isUnMuted) {
+            soundButton.shouldHave(attribute("content-desc", "Mute"));  // или "Unmute"
+            log.info("Звук Включили");
+            Allure.step("Звук Включили");
+        }
+        return this;
+    }
+
 }
