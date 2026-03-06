@@ -44,20 +44,24 @@ public class VideoPlayerPage {
 
     @Step("Тапаем в верхней части экрана (height/4)")
     public VideoPlayerPage tapOnTop() {
-        log.info("Тапаем в верхней части экрана");
         Dimension size = getDriver().manage().window().getSize();
+        int w = size.width / 3;
+        int h = size.height / 4;
+        log.info("Тапаем в верхней части экрана w={}, h={}, где размер экрана = {}", w, h,size);
         new TouchAction<>(getDriver())
-                .tap(PointOption.point(size.width / 2, size.height / 4))
+                .tap(PointOption.point(w, h))
                 .perform();
         return this;
     }
 
     @Step("Тапаем в центре видео (height/3)")
     public VideoPlayerPage tapOnVideo() {
-        log.info("Тапаем в центре видео");
         Dimension size = getDriver().manage().window().getSize();
+        int w = size.width / 2;
+        int h = size.height / 3;
+        log.info("Тапаем в центре части экрана w={}, h={}, где размер экрана = {}", w, h,size);
         new TouchAction<>(getDriver())
-                .tap(PointOption.point(size.width / 2, size.height / 3))
+                .tap(PointOption.point(w, h))
                 .perform();
         return this;
     }
@@ -65,23 +69,16 @@ public class VideoPlayerPage {
     @Step("Проверяем что время увеличилось")
     public VideoPlayerPage verifyTimeIncreasing() {
         log.info("Проверяем что время увеличилось");
-
-        // ПЕРВЫЙ ТАП вверху (height/4) - чтобы увидеть время
-        tapOnTop();
-
         // Получаем начальное время
-        String time1 = seekBar.should(Condition.visible).getAttribute("text");
+        String time1 = getSeekBarTextWithTapRetry();
         log.info("Время начала: {}", time1);
-
         // Ждем 5 секунд
-        log.info("Ждем 2 секунд...");
-        sleep(2000);
+        log.info("Ждем 4 секунд...");
+        sleep(4000);
 
         // ВТОРОЙ ТАП вверху (height/4) - чтобы снова увидеть время
-        tapOnTop();
-
         // Получаем конечное время
-        String time2 = seekBar.should(Condition.visible).getAttribute("text");
+        String time2 = getSeekBarTextWithTapRetry();
         log.info("Время сейчас: {}", time2);
 
         // Проверяем
@@ -95,6 +92,7 @@ public class VideoPlayerPage {
 
     @Step("Делаем паузу")
     public VideoPlayerPage wait(int seconds) {
+        log.info("Пауза {} s", seconds);
         sleep(seconds * 1000L);
         return this;
     }
@@ -128,6 +126,7 @@ public class VideoPlayerPage {
 
     /**
      * Проверяет, загрузилось ли видео (по наличию кнопки звука)
+     *
      * @return true - видео загружено (кнопка звука есть), false - видео не загружено
      */
     @Step("Проверяем, загрузилось ли видео")
@@ -144,4 +143,22 @@ public class VideoPlayerPage {
         }
     }
 
+
+    private String getSeekBarTextWithTapRetry() {
+        // Сначала тапаем
+        tapOnTop();
+        // Ждем появления seekBar с повторными тапами
+        try {
+            // Пробуем подождать с появлением
+            seekBar.should(Condition.appear, Duration.ofSeconds(2));
+        } catch (Error e) {
+            // Если не появился - тапаем еще раз
+            log.info("SeekBar не появился, тапаем повторно");
+            tapOnTop();
+            seekBar.should(Condition.appear, Duration.ofSeconds(2));
+        }
+
+        // Возвращаем текст
+        return seekBar.getAttribute("text");
+    }
 }
